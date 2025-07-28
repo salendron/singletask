@@ -17,7 +17,11 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Println("Type a to add a todo, d to mark the next undone todo as done, or q to quit.")
+	fmt.Println("Welcome to Singletask!")
+	fmt.Println("To add a new todo, type 'a' followed by your todo title.")
+	fmt.Println("To mark the oldest undone todo as done, type 'd'.")
+	fmt.Println("To list all undone todos, type 'l'.")
+	fmt.Println("To terminate the app, type 'q'.")
 
 	for {
 		commandHandler.ShowNextUndoneTodo(todoStorage)
