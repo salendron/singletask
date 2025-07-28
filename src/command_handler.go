@@ -4,6 +4,7 @@ import "fmt"
 
 type CommandHandlerInterface interface {
 	HandleCommand(args []string, storage TodoStorageInterface) error
+	AddTodo(args []string, storage TodoStorageInterface) error
 	ShowNextUndoneTodo(storage TodoStorageInterface) error
 }
 
@@ -16,21 +17,7 @@ func (ch *CommandHandler) HandleCommand(args []string, storage TodoStorageInterf
 
 	switch args[0] {
 	case "a":
-		text := ""
-		if len(args) > 1 {
-			text = args[1]
-			for i := 2; i < len(args); i++ {
-				text += " " + args[i]
-			}
-		}
-
-		todo := &Todo{
-			Title: text,
-		}
-		if err := storage.Save(todo); err != nil {
-			return fmt.Errorf("error saving todo: %w", err)
-		}
-		fmt.Printf("Added todo: %s\n", text)
+		ch.AddTodo(args, storage)
 
 	case "d":
 		ch.setNextUndoneTodoDone(storage)
@@ -38,6 +25,26 @@ func (ch *CommandHandler) HandleCommand(args []string, storage TodoStorageInterf
 	default:
 		fmt.Printf("Unknown command: %s\n", args[0])
 	}
+
+	return nil
+}
+
+func (ch *CommandHandler) AddTodo(args []string, storage TodoStorageInterface) error {
+	text := ""
+	if len(args) > 1 {
+		text = args[1]
+		for i := 2; i < len(args); i++ {
+			text += " " + args[i]
+		}
+	}
+
+	todo := &Todo{
+		Title: text,
+	}
+	if err := storage.Save(todo); err != nil {
+		return fmt.Errorf("error saving todo: %w", err)
+	}
+	fmt.Printf("Added todo: %s\n", text)
 
 	return nil
 }
