@@ -128,6 +128,7 @@ func (s *SQLiteTodoStorage) Delete(id int64) error {
 	return err
 }
 
+// GetAllUndone retrieves all undone todo items
 func (s *SQLiteTodoStorage) GetAllUndone() ([]Todo, error) {
 	result := make([]Todo, 0)
 	rows, err := s.db.Query("SELECT id, title, done, created_at, updated_at from todos where done = FALSE ORDER BY created_at ASC")
