@@ -6,9 +6,26 @@ type CommandHandlerInterface interface {
 	HandleCommand(args []string, storage TodoStorageInterface) error
 	AddTodo(args []string, storage TodoStorageInterface) error
 	ShowNextUndoneTodo(storage TodoStorageInterface) error
+	ShowAllUndoneTodo(storage TodoStorageInterface) error
 }
 
 type CommandHandler struct{}
+
+func (ch *CommandHandler) ShowAllUndoneTodo(storage TodoStorageInterface) error {
+	todos, err := storage.GetAllUndone()
+
+	if err != nil {
+		fmt.Printf("Error querying undone todos: %v\n", err)
+		return err
+	}
+
+	fmt.Printf("Total undone todos: %d\n", len(todos))
+	for _, t := range todos {
+		fmt.Printf("[%d] %s since: %v\n", t.ID, t.Title, t.CreatedAt)
+	}
+
+	return nil
+}
 
 func (ch *CommandHandler) HandleCommand(args []string, storage TodoStorageInterface) error {
 	if len(args) == 0 {
@@ -21,6 +38,9 @@ func (ch *CommandHandler) HandleCommand(args []string, storage TodoStorageInterf
 
 	case "d":
 		ch.setNextUndoneTodoDone(storage)
+
+	case "l":
+		ch.ShowAllUndoneTodo(storage)
 
 	default:
 		fmt.Printf("Unknown command: %s\n", args[0])

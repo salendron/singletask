@@ -23,6 +23,7 @@ type TodoStorageInterface interface {
 	GetAll() ([]Todo, error)
 	GetOldestUndone() (*Todo, error)
 	Delete(id int64) error
+	GetAllUndone() ([]Todo, error)
 }
 
 // SQLiteTodoStorage implements TodoStorage interface
@@ -125,4 +126,28 @@ func (s *SQLiteTodoStorage) GetOldestUndone() (*Todo, error) {
 func (s *SQLiteTodoStorage) Delete(id int64) error {
 	_, err := s.db.Exec("DELETE FROM todos WHERE id=?", id)
 	return err
+}
+
+func (s *SQLiteTodoStorage) GetAllUndone() ([]Todo, error) {
+	result := make([]Todo, 0)
+	rows, err := s.db.Query("SELECT id, title, done, created_at, updated_at from todos where done = FALSE ORDER BY created_at ASC")
+
+	if rows == nil {
+		return result, nil
+	}
+
+	for rows.Next() {
+		todo := &Todo{}
+		if err := rows.Scan(&todo.ID, &todo.Title, &todo.Done, &todo.CreatedAt, &todo.UpdatedAt); err != nil {
+			continue
+		}
+
+		result = append(result, *todo)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
 }
